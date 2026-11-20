@@ -11,7 +11,7 @@ from sklearn.ensemble import RandomForestClassifier
 from sklearn.metrics import (
     precision_score, recall_score, f1_score, accuracy_score,
     average_precision_score, roc_auc_score, confusion_matrix,
-    precision_recall_curve
+    precision_recall_curve, roc_curve
 )
 
 from src.features import carregar_dados, preparar_dados, balancear_treino
@@ -98,6 +98,19 @@ def main(caminho):
     plt.title('Curva Precisao-Recall')
     plt.legend()
     plt.savefig('reports/curva_precisao_recall.png')
+    plt.close()
+
+    plt.figure(figsize=(7, 5))
+    for nome in probabilidades:
+        fpr, tpr, _ = roc_curve(y_test, probabilidades[nome])
+        auc = metricas[nome]['roc_auc']
+        plt.plot(fpr, tpr, label=nome + ' (AUC = ' + str(round(auc, 3)) + ')')
+    plt.plot([0, 1], [0, 1], linestyle='--', color='gray', label='Aleatorio')
+    plt.xlabel('Taxa de falsos positivos')
+    plt.ylabel('Taxa de verdadeiros positivos (Recall)')
+    plt.title('Curva ROC')
+    plt.legend()
+    plt.savefig('reports/curva_roc.png')
     plt.close()
 
     print('Arquivos salvos nas pastas models e reports')
